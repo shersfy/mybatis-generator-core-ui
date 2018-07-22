@@ -59,7 +59,7 @@ public class BootApplication extends JFrame implements ActionListener{
 	private static final int MARGIN_LEFT = 20;
 	private static final int MARGIN_TOP  = 20;
 	
-	private static final int TXT_LEN  	= 10;
+	private static final int TXT_LEN  	= 18;
 	
 	private static final int ID_HOME  	= 0;
 	private static final int ID_CONFIG  = 1;
@@ -71,9 +71,11 @@ public class BootApplication extends JFrame implements ActionListener{
 	private static final String XML_PACKAGE		= "mapping";
 	private static final String MODEL_PACKAGE 	= "org.shersfy.model";
 	private static final String DAO_PACKAGE 	= "org.shersfy.mapper";
-	private static final String ROOT_CLASS 		= "org.mybatis.app.entity.BaseEntity";
+	private static final String ROOT_CLASS 		= "org.shersfy.model.BaseEntity";
 	
-	private static final String hostname 		= "127.0.0.1";
+	private static final String mysqlUrl 		= "jdbc:mysql://localhost:3306/dbname?useUnicode=true&characterEncoding=utf8&useSSL=false";
+	private static final String oracleUrl 		= "jdbc:oracle:thin:@localhost:1521:dbname";
+	private static final String msSQLUrl 		= "jdbc:sqlserver://localhost:1433;DatabaseName=dbname";
 	
 	
 	
@@ -85,9 +87,7 @@ public class BootApplication extends JFrame implements ActionListener{
 	//UI
 	private JPanel mainPane;
 	private JComboBox<DbMeta> dbCombo;
-	private JTextField txtIp;
-	private JTextField txtPort;
-	private JTextField txtDbName;
+	private JTextField txtUrl;
 	private JTextField txtUser;
 	private JTextField txtPwd;
 	private Table sampleTable;
@@ -105,10 +105,11 @@ public class BootApplication extends JFrame implements ActionListener{
 		
 		JPanel subPane1 = new JPanel();
 		subPane1.setSize(500,500);
-		subPane1.setLayout(new GridLayout(0, 2, MARGIN, MARGIN));
+		GridLayout grid = new GridLayout(0, 2, MARGIN, MARGIN);
+		subPane1.setLayout(grid);
 			
 		// 数据库类型
-		JLabel label = new JLabel("数据库类型");  
+		JLabel label = new JLabel("数据库类型");
 		subPane1.add(label); 
 		dbCombo = new JComboBox<DbMeta>();
 		dbCombo.addItem(new DbMeta(DbMeta.MYSQL));
@@ -117,29 +118,13 @@ public class BootApplication extends JFrame implements ActionListener{
 		dbCombo.setSelectedIndex(0);
 		subPane1.add(dbCombo);
 		
-		// IP地址
-		JLabel lbIP = new JLabel("IP地址");
-		subPane1.add(lbIP);
-		txtIp = new JTextField(TXT_LEN);
-		txtIp.setFont(FONT_SIZE);
-		txtIp.setText(hostname);
-		subPane1.add(txtIp);
-		
-		// 端口号
-		JLabel lbPort = new JLabel("端口号");
-		subPane1.add(lbPort);
-		txtPort = new JTextField(TXT_LEN);
-		txtPort.setFont(FONT_SIZE);
-		txtPort.setText("3306");
-		subPane1.add(txtPort);
-		
-		// 数据库
-		JLabel lbDbName = new JLabel("数据库名");
-		subPane1.add(lbDbName);
-		txtDbName = new JTextField(TXT_LEN);
-		txtDbName.setFont(FONT_SIZE);
-		//txtDbName.setText("Database");
-		subPane1.add(txtDbName);
+		// 连接URL
+		JLabel lbUrl = new JLabel("连接URL");
+		subPane1.add(lbUrl);
+		txtUrl = new JTextField(TXT_LEN);
+		txtUrl.setFont(FONT_SIZE);
+		txtUrl.setText(mysqlUrl);
+		subPane1.add(txtUrl);
 		
 		// 用户名
 		JLabel lbUser = new JLabel("用户名");
@@ -176,13 +161,13 @@ public class BootApplication extends JFrame implements ActionListener{
 				DbMeta db = (DbMeta) e.getItem();
 				switch (db.getTypeCode()) {
 				case DbMeta.MYSQL:
-					txtPort.setText("3306");
+					txtUrl.setText(mysqlUrl);
 					break;
 				case DbMeta.ORACLE:
-					txtPort.setText("1521");
+					txtUrl.setText(oracleUrl);
 					break;
 				case DbMeta.MSSQL:
-					txtPort.setText("1433");
+					txtUrl.setText(msSQLUrl);
 					break;
 				default:
 					break;
@@ -195,9 +180,7 @@ public class BootApplication extends JFrame implements ActionListener{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				DbMeta db = (DbMeta) dbCombo.getSelectedItem();
-				db.setHost(txtIp.getText());
-				db.setPort(txtPort.getText());
-				db.setDbName(txtDbName.getText());
+				db.setConnectionURL(txtUrl.getText());
 				db.setUserId(txtUser.getText());
 				db.setPassword(txtPwd.getText());
 				if(connection(db)){
@@ -235,9 +218,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		case ID_HOME:
 			// jdbc配置操作
 			DbMeta db = (DbMeta) dbCombo.getSelectedItem();
-			db.setHost(txtIp.getText());
-			db.setPort(txtPort.getText());
-			db.setDbName(txtDbName.getText());
+			db.setConnectionURL(txtUrl.getText());
 			db.setUserId(txtUser.getText());
 			db.setPassword(txtPwd.getText());
 			
@@ -386,7 +367,7 @@ public class BootApplication extends JFrame implements ActionListener{
 				if(res == JOptionPane.YES_OPTION){
 					ShellRunner.main(null);
 					output.setText(config.getJavaModelGenerator().getTargetProject());
-					// JProgressBar prog = new JProgressBar();
+					// copy BaseEntity
 					JOptionPane.showMessageDialog(this, "生成完毕");
 				}
 			}

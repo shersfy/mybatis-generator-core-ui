@@ -1,4 +1,4 @@
-package org.mybatis.app.entity;
+package org.shersfy.model;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -7,8 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 public class DbMeta extends JdbcConnection{
 	
 	public static final String MYSQL 	= "MySQL";
@@ -16,11 +14,7 @@ public class DbMeta extends JdbcConnection{
 	public static final String MSSQL 	= "MSSQL";
 	
 	private String typeCode;
-	private String host;
-	private String port;
-	private String dbName;
 	private String schema;
-	
 	
 	public DbMeta() {
 	}
@@ -28,15 +22,12 @@ public class DbMeta extends JdbcConnection{
 		switch (typeCode) {
 		case MYSQL:
 			this.setDriverClass("com.mysql.jdbc.Driver");
-			this.setConnectionURL("jdbc:mysql://%s:%s/%s");
 			break;
 		case ORACLE:
 			this.setDriverClass("oracle.jdbc.driver.OracleDriver");
-			this.setConnectionURL("jdbc:oracle:thin:@%s:%s:%s");
 			break;
 		case MSSQL:
 			this.setDriverClass("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			this.setConnectionURL("jdbc:sqlserver://%s:%s;DatabaseName=%s");
 			break;
 		default:
 			break;
@@ -52,43 +43,6 @@ public class DbMeta extends JdbcConnection{
 		this.typeCode = typeCode;
 	}
 
-	public String getHost() {
-		return host;
-	}
-
-	public String getPort() {
-		return port;
-	}
-
-	public String getDbName() {
-		return dbName;
-	}
-
-	public void setHost(String host) {
-		this.host = host;
-	}
-
-	public void setPort(String port) {
-		this.port = port;
-	}
-
-	public void setDbName(String dbName) {
-		this.dbName = dbName;
-	}
-	
-	
-	
-	@Override
-	public String getConnectionURL() {
-		String url = super.getConnectionURL();
-		if(!StringUtils.isBlank(url)){
-			url = String.format(url, 
-					this.getHost(),
-					this.getPort(),
-					this.getDbName());
-		}
-		return url;
-	}
 	public String getSchema() {
 		if(schema != null){
 			return schema;
