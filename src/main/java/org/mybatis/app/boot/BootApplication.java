@@ -1,4 +1,4 @@
-package org.mybatis.generator.add.ui;
+package org.mybatis.app.boot;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -31,6 +31,11 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import org.apache.log4j.Logger;
+import org.mybatis.generator.add.ui.AddMethodMapper;
+import org.mybatis.generator.add.ui.Button;
+import org.mybatis.generator.add.ui.CheckBox;
+import org.mybatis.generator.add.ui.CreatedConfigXml;
+import org.mybatis.generator.add.ui.TextField;
 import org.mybatis.generator.add.ui.beans.CommentGenerator;
 import org.mybatis.generator.add.ui.beans.ContextBean;
 import org.mybatis.generator.add.ui.beans.DbMeta;
@@ -42,7 +47,7 @@ import org.mybatis.generator.add.ui.beans.SqlMapGenerator;
 import org.mybatis.generator.add.ui.beans.Table;
 import org.mybatis.generator.api.ShellRunner;
 
-public class MainUI extends JFrame implements ActionListener{
+public class BootApplication extends JFrame implements ActionListener{
 	
 	/**
 	 * 
@@ -62,15 +67,17 @@ public class MainUI extends JFrame implements ActionListener{
 	private static final int ID_TABLES  = 3;
 	private static final int ID_CREATE  = 4;
 	
-	private static final String OUTPATH 		= "e:/mybatis/output";
-	private static final String ROOT_CLASS 		= "com.lenovo.datahub.domain.BaseEntity";
-	private static final String MODEL_PACKAGE 	= "com.lenovo.datahub.domain";
-	private static final String XML_PACKAGE		= "mapper";
-	private static final String DAO_PACKAGE 	= "com.lenovo.datahub.dao";
+	private static final String OUTPATH 		= "C:/mybatis/output";
+	private static final String XML_PACKAGE		= "mapping";
+	private static final String MODEL_PACKAGE 	= "org.shersfy.model";
+	private static final String DAO_PACKAGE 	= "org.shersfy.mapper";
+	private static final String ROOT_CLASS 		= "org.mybatis.app.entity.BaseEntity";
+	
+	private static final String hostname 		= "127.0.0.1";
 	
 	
 	
-	private static Logger logger = Logger.getLogger(MainUI.class);
+	private static Logger logger = Logger.getLogger(BootApplication.class);
 	
 	private ContextBean config;
 	private Map<Integer, JPanel> mainPaneMap;
@@ -85,7 +92,7 @@ public class MainUI extends JFrame implements ActionListener{
 	private JTextField txtPwd;
 	private Table sampleTable;
 	
-	public MainUI(String title){
+	public BootApplication(String title){
 		config = new ContextBean();
 		mainPaneMap = new HashMap<Integer, JPanel>();
 		this.setTitle(title);  
@@ -115,7 +122,7 @@ public class MainUI extends JFrame implements ActionListener{
 		subPane1.add(lbIP);
 		txtIp = new JTextField(TXT_LEN);
 		txtIp.setFont(FONT_SIZE);
-		txtIp.setText("192.168.100.136");
+		txtIp.setText(hostname);
 		subPane1.add(txtIp);
 		
 		// 端口号
@@ -211,7 +218,7 @@ public class MainUI extends JFrame implements ActionListener{
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		MainUI ui = new MainUI("Mybatis Generator");
+		BootApplication ui = new BootApplication("Mybatis Generator");
 	}
 	
 	@SuppressWarnings({"unchecked" })
