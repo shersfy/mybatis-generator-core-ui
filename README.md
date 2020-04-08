@@ -1,2 +1,5 @@
 # mybatis-generator-core-ui
-## 使用说明
+## build
+```
+mvn clean package -DskipTests
+```
