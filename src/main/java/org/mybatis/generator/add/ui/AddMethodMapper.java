@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.util.List;
 
 
-import org.apache.log4j.Logger;
 import org.dom4j.Comment;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -14,17 +13,17 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.mybatis.app.boot.BootApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 添加findList方法
- * @author PengYang
+ * @author Young
  * @date 2016-10-27
  *
- * @copyright
- * Copyright Lenovo Corporation 2016 All Rights Reserved.
  */
 public class AddMethodMapper {
-	private static Logger logger = Logger.getLogger(AddMethodMapper.class);
+	private static Logger logger = LoggerFactory.getLogger(AddMethodMapper.class);
 	/**格式化文件**/
 	public static void formatXml(){
 		try {
@@ -35,7 +34,7 @@ public class AddMethodMapper {
 			}
 			logger.info("MyBatis Generator finished successfully.");
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("", e);
 		}
 	}
 	/**清除文件**/
@@ -189,9 +188,9 @@ public class AddMethodMapper {
 			fw.write(document);
 			fw.flush();
 			fw.close();
-			logger.info(xmlFile.getPath()+"创建完成");
+			logger.info("create mapper xml '{}' successful", xmlFile.getPath());
 		} catch (Exception e) { 
-			logger.error(e);
+			logger.error("", e);
 		} 
 
 	}

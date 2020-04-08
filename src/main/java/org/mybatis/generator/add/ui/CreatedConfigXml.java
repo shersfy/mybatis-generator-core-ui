@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -22,23 +21,23 @@ import org.mybatis.generator.add.ui.beans.JavaTypeResolver;
 import org.mybatis.generator.add.ui.beans.JdbcConnection;
 import org.mybatis.generator.add.ui.beans.SqlMapGenerator;
 import org.mybatis.generator.add.ui.beans.Table;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
  * 生成配置文件
- * @author PengYang
+ * @author Young
  * @date 2016-12-21
  *
- * @copyright
- * Copyright Lenovo Corporation 2016 All Rights Reserved.
  */
 public class CreatedConfigXml {
 	
 	public static final String CONF_XML = BootApplication.CONF_XML;
 	
-	private static Logger logger = Logger.getLogger(CreatedConfigXml.class);
+	private static Logger logger = LoggerFactory.getLogger(CreatedConfigXml.class);
 	
 	public static File createConfigXml(ContextBean context){
 		File xmlFile = new File(ClassLoader.getSystemResource("./").getPath(), CONF_XML);
@@ -126,10 +125,10 @@ public class CreatedConfigXml {
 			fw.write(doc);
 			fw.flush();
 			fw.close();
-			logger.info(xmlFile.getPath()+" 创建完成");
+			logger.info("create config xml '{}' successful", xmlFile.getPath());
 
 		} catch (Exception e) {
-			logger.error("创建配置文件异常", e);
+			logger.error("create config xml error", e);
 		}
 		
 		return xmlFile;
