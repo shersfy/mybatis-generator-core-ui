@@ -13,6 +13,7 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.mybatis.app.boot.BootApplication;
 
 /**
  * 添加findList方法
@@ -242,7 +243,7 @@ public class AddMethodMapper {
 		//2。获得具体的DOM解析器。  
 		//DocumentBuilder builder = factory.newDocumentBuilder();  
 		//3。获取文件  
-		Document document = reader.read(ClassLoader.getSystemResource("generatorConfig.xml"));
+		Document document = reader.read(ClassLoader.getSystemResource(BootApplication.CONF_XML));
 		//4。获取根元素  
 		Element root = document.getRootElement();
 		

@@ -13,6 +13,7 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
+import org.mybatis.app.boot.BootApplication;
 import org.mybatis.generator.add.ui.beans.CommentGenerator;
 import org.mybatis.generator.add.ui.beans.ContextBean;
 import org.mybatis.generator.add.ui.beans.JavaClientGenerator;
@@ -35,7 +36,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class CreatedConfigXml {
 	
-	public static final String CONF_XML = "generatorConfig.xml";
+	public static final String CONF_XML = BootApplication.CONF_XML;
 	
 	private static Logger logger = Logger.getLogger(CreatedConfigXml.class);
 	

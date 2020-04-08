@@ -30,7 +30,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.mybatis.generator.add.ui.AddMethodMapper;
 import org.mybatis.generator.add.ui.Button;
 import org.mybatis.generator.add.ui.CheckBox;
@@ -38,7 +38,7 @@ import org.mybatis.generator.add.ui.CreatedConfigXml;
 import org.mybatis.generator.add.ui.TextField;
 import org.mybatis.generator.add.ui.beans.CommentGenerator;
 import org.mybatis.generator.add.ui.beans.ContextBean;
-import org.mybatis.generator.add.ui.beans.DbMeta;
+import org.mybatis.generator.add.ui.beans.JdbcConnectionExt;
 import org.mybatis.generator.add.ui.beans.JavaClientGenerator;
 import org.mybatis.generator.add.ui.beans.JavaModelGenerator;
 import org.mybatis.generator.add.ui.beans.JavaTypeResolver;
@@ -46,6 +46,9 @@ import org.mybatis.generator.add.ui.beans.JdbcConnection;
 import org.mybatis.generator.add.ui.beans.SqlMapGenerator;
 import org.mybatis.generator.add.ui.beans.Table;
 import org.mybatis.generator.api.ShellRunner;
+import org.shersfy.utils.LocalConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BootApplication extends JFrame implements ActionListener{
 	
@@ -67,32 +70,36 @@ public class BootApplication extends JFrame implements ActionListener{
 	private static final int ID_TABLES  = 3;
 	private static final int ID_CREATE  = 4;
 	
-	private static final String OUTPATH 		= "C:/mybatis/output";
-	private static final String XML_PACKAGE		= "mapping";
-	private static final String MODEL_PACKAGE 	= "org.shersfy.model";
-	private static final String DAO_PACKAGE 	= "org.shersfy.mapper";
-	private static final String ROOT_CLASS 		= "org.shersfy.model.BaseEntity";
+	public static String OUTPATH  = LocalConfig.getOutputPath();
+	public static String CONF_XML = LocalConfig.getOutputConf();
 	
-	private static final String mysqlUrl 		= "jdbc:mysql://localhost:3306/dbname?useUnicode=true&characterEncoding=utf8&useSSL=false";
-	private static final String oracleUrl 		= "jdbc:oracle:thin:@localhost:1521:dbname";
-	private static final String msSQLUrl 		= "jdbc:sqlserver://localhost:1433;DatabaseName=dbname";
+	public static String PKG_XML	= LocalConfig.getPkgXml();
+	public static String PKG_MODEL 	= LocalConfig.getPkgModel();
+	public static String PKG_MAPPER = LocalConfig.getPkgMappger();
+	public static String PKG_ROOT_CLASS = LocalConfig.getPkgRootClass();
 	
+	public static String JDBC_URL  = LocalConfig.getJdbcUrl();
+	public static String JDBC_USER = LocalConfig.getJdbcUsername();
+	public static String JDBC_PWD  = LocalConfig.getJdbcPassword();
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(BootApplication.class);
 	
-	private static Logger logger = Logger.getLogger(BootApplication.class);
-	
+	private JdbcConnectionExt conn;
 	private ContextBean config;
 	private Map<Integer, JPanel> mainPaneMap;
 	
 	//UI
 	private JPanel mainPane;
-	private JComboBox<DbMeta> dbCombo;
+	private JComboBox<String> dbCombo;
 	private JTextField txtUrl;
 	private JTextField txtUser;
 	private JTextField txtPwd;
 	private Table sampleTable;
 	
 	public BootApplication(String title){
+		conn = new JdbcConnectionExt();
+		conn.setDriverClass(LocalConfig.getJdbcDriver());
+		
 		config = new ContextBean();
 		mainPaneMap = new HashMap<Integer, JPanel>();
 		this.setTitle(title);  
@@ -111,10 +118,11 @@ public class BootApplication extends JFrame implements ActionListener{
 		// 数据库类型
 		JLabel label = new JLabel("数据库类型");
 		subPane1.add(label); 
-		dbCombo = new JComboBox<DbMeta>();
-		dbCombo.addItem(new DbMeta(DbMeta.MYSQL));
-		dbCombo.addItem(new DbMeta(DbMeta.ORACLE));
-		dbCombo.addItem(new DbMeta(DbMeta.MSSQL));
+		dbCombo = new JComboBox<>();
+		String[] arr = LocalConfig.getJdbcSupport().split(",");
+		for(String dbname :arr) {
+			dbCombo.addItem(dbname.trim());
+		}
 		dbCombo.setSelectedIndex(0);
 		subPane1.add(dbCombo);
 		
@@ -123,7 +131,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		subPane1.add(lbUrl);
 		txtUrl = new JTextField(TXT_LEN);
 		txtUrl.setFont(FONT_SIZE);
-		txtUrl.setText(mysqlUrl);
+		txtUrl.setText(JDBC_URL);
 		subPane1.add(txtUrl);
 		
 		// 用户名
@@ -131,7 +139,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		subPane1.add(lbUser);
 		txtUser = new JTextField(TXT_LEN);
 		txtUser.setFont(FONT_SIZE);
-		//txtUser.setText("Username");
+		txtUser.setText(JDBC_USER);
 		subPane1.add(txtUser);
 		
 		// 密码
@@ -139,7 +147,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		subPane1.add(lbPwd);
 		txtPwd = new JTextField(TXT_LEN);
 		txtPwd.setFont(FONT_SIZE);
-		//txtPwd.setText("Password");
+		txtPwd.setText(JDBC_PWD);
 		subPane1.add(txtPwd);
 		
 		subPane1.add(new JLabel());
@@ -158,20 +166,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		dbCombo.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				DbMeta db = (DbMeta) e.getItem();
-				switch (db.getTypeCode()) {
-				case DbMeta.MYSQL:
-					txtUrl.setText(mysqlUrl);
-					break;
-				case DbMeta.ORACLE:
-					txtUrl.setText(oracleUrl);
-					break;
-				case DbMeta.MSSQL:
-					txtUrl.setText(msSQLUrl);
-					break;
-				default:
-					break;
-				}
+				// none
 			}
 		});
 		// 点击【连接】
@@ -179,11 +174,10 @@ public class BootApplication extends JFrame implements ActionListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				DbMeta db = (DbMeta) dbCombo.getSelectedItem();
-				db.setConnectionURL(txtUrl.getText());
-				db.setUserId(txtUser.getText());
-				db.setPassword(txtPwd.getText());
-				if(connection(db)){
+				conn.setConnectionURL(txtUrl.getText());
+				conn.setUserId(txtUser.getText());
+				conn.setPassword(txtPwd.getText());
+				if(connection(conn)){
 					JOptionPane.showMessageDialog(null, "连接成功");
 				}
 			}
@@ -201,7 +195,13 @@ public class BootApplication extends JFrame implements ActionListener{
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-		BootApplication ui = new BootApplication("Mybatis Generator");
+		String appname = LocalConfig.getAppName();
+		String version = LocalConfig.getAppVersion();
+		if (StringUtils.isBlank(appname)) {
+			throw new IOException("application name cannot be empty");
+		}
+		LOGGER.info("start application '{}'", appname);
+		BootApplication ui = new BootApplication(appname+" "+version);
 	}
 	
 	@SuppressWarnings({"unchecked" })
@@ -217,20 +217,19 @@ public class BootApplication extends JFrame implements ActionListener{
 		switch (next.getId()) {
 		case ID_HOME:
 			// jdbc配置操作
-			DbMeta db = (DbMeta) dbCombo.getSelectedItem();
-			db.setConnectionURL(txtUrl.getText());
-			db.setUserId(txtUser.getText());
-			db.setPassword(txtPwd.getText());
+			conn.setConnectionURL(txtUrl.getText());
+			conn.setUserId(txtUser.getText());
+			conn.setPassword(txtPwd.getText());
 			
-			if(!connection(db)){
+			if(!connection(conn)){
 				return;
 			}
 			
 			JdbcConnection jdbcConnection = new JdbcConnection();
-			jdbcConnection.setDriverClass(db.getDriverClass());
-			jdbcConnection.setConnectionURL(db.getConnectionURL());
-			jdbcConnection.setUserId(db.getUserId());
-			jdbcConnection.setPassword(db.getPassword());
+			jdbcConnection.setDriverClass(conn.getDriverClass());
+			jdbcConnection.setConnectionURL(conn.getConnectionURL());
+			jdbcConnection.setUserId(conn.getUserId());
+			jdbcConnection.setPassword(conn.getPassword());
 			
 			config.setJdbcConnection(jdbcConnection);
 			
@@ -410,12 +409,11 @@ public class BootApplication extends JFrame implements ActionListener{
 		String[] tables = null;
 		try {
 			
-			DbMeta meta = (DbMeta) dbCombo.getSelectedItem();
-			List<String> tbs = DbMeta.getTables(meta);
+			List<String> tbs = JdbcConnectionExt.getTables(conn);
 			tables = tbs.toArray(new String[tbs.size()]);
 			
 		} catch (Exception e) {
-			logger.error(e);
+			LOGGER.error("", e);
 		}
 		
 		JList<String> list = new JList<String>(tables);
@@ -585,14 +583,14 @@ public class BootApplication extends JFrame implements ActionListener{
 		TextField rootClass = new TextField(TXT_LEN+10);
 		rootClass.setId(21);
 		rootClass.setFont(fo);
-		rootClass.setText(ROOT_CLASS);
+		rootClass.setText(PKG_ROOT_CLASS);
 		subPanel.add(rootClass);
 		
 		subPanel.add(new JLabel("Model输出包名"));
 		TextField modePackage = new TextField(TXT_LEN+10);
 		modePackage.setId(22);
 		modePackage.setFont(fo);
-		modePackage.setText(MODEL_PACKAGE);
+		modePackage.setText(PKG_MODEL);
 		subPanel.add(modePackage);
 		
 		//第3组
@@ -600,7 +598,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		TextField xmlPackage = new TextField(TXT_LEN+10);
 		xmlPackage.setId(31);
 		xmlPackage.setFont(fo);
-		xmlPackage.setText(XML_PACKAGE);
+		xmlPackage.setText(PKG_XML);
 		subPanel.add(xmlPackage);
 		
 		//第4组
@@ -616,7 +614,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		TextField daoPackage = new TextField(TXT_LEN+10);
 		daoPackage.setId(41);
 		daoPackage.setFont(fo);
-		daoPackage.setText(DAO_PACKAGE);
+		daoPackage.setText(PKG_MAPPER);
 		subPanel.add(daoPackage);
 		
 		subPanel.add(new JLabel());
@@ -644,13 +642,13 @@ public class BootApplication extends JFrame implements ActionListener{
 		return subPanel;
 	}
 	
-	public boolean connection(DbMeta meta){
+	public boolean connection(JdbcConnectionExt meta){
 		boolean flg = true;
 		try {
 			DriverManager.getConnection(meta.getConnectionURL(), meta.getUserId(), meta.getPassword());
 		} catch (Exception ex) {
 			flg = false;
-			logger.error("", ex);
+			LOGGER.error("", ex);
 			JOptionPane.showMessageDialog(null, "连接异常\n"+ex.getMessage(), "异常", JOptionPane.ERROR_MESSAGE);
 		}
 		return flg;

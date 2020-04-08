@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.mybatis.app.boot.BootApplication;
 import org.mybatis.generator.add.ui.AddMethodMapper;
 import org.mybatis.generator.base.Const;
 import org.mybatis.generator.config.Configuration;
@@ -52,7 +53,7 @@ public class ShellRunner {
     private static final String HELP_1 = "-?"; //$NON-NLS-1$
     private static final String HELP_2 = "-h"; //$NON-NLS-1$
     
-    private static final String config = "generatorConfig.xml";
+    private static final String config = BootApplication.CONF_XML;
 
     public static void main(String[] args) {
     	//Add 2016-4-29 添加跟路径 start
