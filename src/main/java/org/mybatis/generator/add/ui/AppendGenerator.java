@@ -517,6 +517,7 @@ public class AppendGenerator {
 			removeComment(root);
 			removeComment(insertNode);
 			
+			// 插入节点
 			List<Element> all = new ArrayList<>();
 			root.elements().forEach(obj->{
 				Element e = (Element) obj;
