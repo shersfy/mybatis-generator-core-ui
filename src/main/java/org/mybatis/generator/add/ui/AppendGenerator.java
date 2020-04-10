@@ -517,11 +517,21 @@ public class AppendGenerator {
 			removeComment(root);
 			removeComment(insertNode);
 			
-			root.add(deleteByIds);
-			root.add(insertNode);
-			root.add(select);
-			root.add(selectCount);
-			root.add(sqlNode);
+			List<Element> all = new ArrayList<>();
+			root.elements().forEach(obj->{
+				Element e = (Element) obj;
+				all.add(e);
+				if (e.getName().equals("delete")) {
+					all.add(deleteByIds);
+				}
+			});
+			all.add(insertNode);
+			all.add(select);
+			all.add(selectCount);
+			all.add(sqlNode);
+			
+			root.elements().clear();
+			all.forEach(e->root.add(e));
 
 			document.setRootElement(root);
 			// 可以使用 addDocType()方法添加文档类型说明。
