@@ -16,8 +16,8 @@ public class SAXReaderUtil {
 	private static SAXReader reader;
 	
 	static {
-		reader = new SAXReader();
 		try {
+			reader = new SAXReader();
 			reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 		} catch (SAXException e) {
 			LOGGER.error("", e);

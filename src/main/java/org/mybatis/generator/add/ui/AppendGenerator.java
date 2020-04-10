@@ -70,7 +70,7 @@ public class AppendGenerator {
 			File file = new File(getXmlMappingPath());
 			File[] list = file.listFiles();
 			for(File xml : list){
-				createXml(xml);
+				generateXml(xml);
 			}
 			LOGGER.info("MyBatis Generator finished successfully.");
 			return list.length;
@@ -177,7 +177,7 @@ public class AppendGenerator {
 		}
 	}
 
-	private static void generateJavaMapper() {
+	public static void generateJavaMapper() {
 
 		// view TemplateServiceImpl.java
 		String template = null;
@@ -403,27 +403,17 @@ public class AppendGenerator {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void createXml(File xmlFile){
+	public static void generateXml(File xml){
 
 		try {
-			//1。获取DOM 解析器的工厂实例。  
-			// SAXReader reader = new SAXReader(); 
-			//2。获得具体的DOM解析器。  
-			//DocumentBuilder builder = factory.newDocumentBuilder();  
-			//3。获取文件  
-			Document document = SAXReaderUtil.getDocument(xmlFile);
-			//Document extDoc = DocumentHelper.createDocument();
-			//4。获取根元素  
+			Document document = SAXReaderUtil.getDocument(xml);
 			Element root = document.getRootElement();
-			//5。获取节点[有多个节点]
 
 			List<Element> list = root.elements("resultMap");
 			Element resMapNode = list.get(0);
-			String paramType = resMapNode.attributeValue("type");
-			String[] arr = paramType .split("[.]");
-			paramType = arr[arr.length-1];
+			String paramType   = resMapNode.attributeValue("type");
 
-			// select start
+			// select findList start
 			Element includeColumn = DocumentHelper.createElement("include");
 			includeColumn.addAttribute("refid", "Base_Column_List");
 
@@ -440,22 +430,22 @@ public class AppendGenerator {
 			if1.addAttribute("test", "startIndex !=null  and pageSize !=null");
 			if1.setText("limit #{startIndex}, #{pageSize}");
 
-			String table = camelToUnderline(paramType);
+			String table = camelToUnderline(ClassUtils.getShortClassName(paramType));
 
 			Element select = DocumentHelper.createElement("select");
 			select.addAttribute("id", "findList");
 			select.addAttribute("resultMap", "BaseResultMap");
 			select.addAttribute("parameterType", paramType);
 
-			select.add(DocumentHelper.createText("select"));
+			select.add(DocumentHelper.createText("select "));
 			select.add(includeColumn);
-			select.add(DocumentHelper.createText("from "+table));
+			select.add(DocumentHelper.createText(" from "+table));
 			Element includeCondition = DocumentHelper.createElement("include");
 			includeCondition.addAttribute("refid", "condition");
 			select.add(includeCondition);
 			select.add(choose);
 			select.add(if1);
-			// select end
+			// select findList end
 
 			// select findListCount start
 			Element selectCount = DocumentHelper.createElement("select");
@@ -469,7 +459,7 @@ public class AppendGenerator {
 			selectCount.add(includeCondition);
 			// select findListCount end
 
-			// sql start
+			// sql condition start
 			Element sqlNode = DocumentHelper.createElement("sql");
 			sqlNode.addAttribute("id", "condition");
 
@@ -493,7 +483,7 @@ public class AppendGenerator {
 				sqlWhereNode.add(sqlIfNode);
 			}
 			sqlNode.add(sqlWhereNode);
-			// sql end
+			// sql condition end
 
 			// insert start
 			Element insertNode = (Element) root.elements("insert").get(0);
@@ -501,43 +491,65 @@ public class AppendGenerator {
 			insertNode.addAttribute("keyProperty", "id");
 			insertNode.addAttribute("useGeneratedKeys", "true");
 			// insert end
+			
+			// delete deleteByIds start
+			Element deleteByIds = DocumentHelper.createElement("delete");
+			deleteByIds.addAttribute("id", "deleteByIds");
+			deleteByIds.addAttribute("parameterType", "list");
+			deleteByIds.add(DocumentHelper.createText(String.format("delete from %s where id in ", table)));
+
+			Element foreach = DocumentHelper.createElement("foreach");
+			foreach.addAttribute("collection", "list");
+			foreach.addAttribute("item", "id");
+			foreach.addAttribute("open", "(");
+			foreach.addAttribute("close", ")");
+			foreach.addAttribute("separator", ", ");
+			foreach.addAttribute("index", "i");
+			foreach.setText("#{id}");
+			deleteByIds.add(foreach);
+			// delete deleteByIds end
 
 			//root
 			//Element extRoot = DocumentHelper.createElement("mapper");
 			root.remove(insertNode);
+			// 输出不需要的节点
+			removeNode(root);
+			// 删除注释节点
+			removeComment(root);
+			removeComment(insertNode);
+			
+			root.add(deleteByIds);
 			root.add(insertNode);
 			root.add(select);
 			root.add(selectCount);
 			root.add(sqlNode);
 
-			// 输出不需要的节点
-			removeNode(root);
-			// 删除注释节点
-			removeComment(root);
-
 			document.setRootElement(root);
 			// 可以使用 addDocType()方法添加文档类型说明。
 			//extDoc.addDocType("mapper", "-//mybatis.org//DTD Mapper 3.0//EN", "http://mybatis.org/dtd/mybatis-3-mapper.dtd");
 
-			OutputFormat xmlFormat = new OutputFormat();
+			OutputFormat xmlFormat = OutputFormat.createPrettyPrint();
 			//设置文件编码 
 			xmlFormat.setEncoding("UTF-8");
 			// 设置换行
 			xmlFormat.setNewlines(true);
+			xmlFormat.setNewLineAfterDeclaration(true);
 			// 生成缩进
 			xmlFormat.setIndent(true);
+			// 删除空白
+			// xmlFormat.setTrimText(true);
 			// 使用4个空格进行缩进
-			xmlFormat.setIndentSize(4);
+			// xmlFormat.setIndentSize(4);
 
-			XMLWriter fw = new XMLWriter(new FileWriter(xmlFile), xmlFormat);
+			XMLWriter fw = new XMLWriter(new FileWriter(xml), xmlFormat);
 			LOGGER.debug(document.asXML());
 
 			fw.write(document);
 			fw.flush();
 			fw.close();
-			LOGGER.info("create mapper xml '{}' successful", xmlFile.getPath());
+			LOGGER.info("create mapper xml '{}' successful", xml.getPath());
 		} catch (Exception e) { 
-			LOGGER.error(xmlFile.getAbsolutePath(), e);
+			LOGGER.error(xml.getAbsolutePath(), e);
 		} 
 
 	}
