@@ -18,8 +18,8 @@
             <outputDirectory>conf</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>src/main/resources/logs</directory>
-            <outputDirectory>logs</outputDirectory>
+            <directory>src/main/resources/template</directory>
+            <outputDirectory>template</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>src/main/resources/version</directory>
