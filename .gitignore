@@ -12,3 +12,5 @@ logs/
 .externalToolBuilders
 .idea
 *.iml
+# files
+conf/generatorConfig.xml
