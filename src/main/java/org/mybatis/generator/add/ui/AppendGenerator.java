@@ -299,6 +299,8 @@ public class AppendGenerator {
 
 		File service = new File(parent, String.format("service/%sService.java", modelName));
 		String servicePkg  = getModelParentPkg()+".service";
+		
+		LOGGER.info("generate service {}", service.getAbsolutePath());
 
 		List<String> lines = new ArrayList<>();
 		// package
@@ -340,6 +342,8 @@ public class AppendGenerator {
 		String mapperPkg = BootApplication.getContextBean().getJavaClientGenerator().getTargetPackage();
 		String servicePkg = getModelParentPkg()+".service";
 
+		LOGGER.info("generate service implement {}", serviceImpl.getAbsolutePath());
+		
 		// package
 		String data = template.replace("org.shersfy.mapper", mapperPkg);
 		data = data.replace("org.shersfy.service", servicePkg);
