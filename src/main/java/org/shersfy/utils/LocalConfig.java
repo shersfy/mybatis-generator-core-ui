@@ -1,5 +1,6 @@
 package org.shersfy.utils;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
@@ -63,9 +64,10 @@ public class LocalConfig {
 		LOGGER.info("load configuration properties {} successful", CONF_PATH);
 	}
 	
-	public static String getConfFile() {
+	public static File getBasedir() {
 		URL url = ClassLoader.getSystemResource(CONF_PATH);
-		return url==null?null:url.getFile();
+		File conf = new File(url.getPath());
+		return conf.getParentFile().getParentFile();
 	}
 
 	public static String getAppName() {

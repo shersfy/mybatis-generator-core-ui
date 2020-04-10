@@ -82,16 +82,11 @@ public class AppendGenerator {
 
 	public static void copyBaseClass() {
 
-		File conf = new File(LocalConfig.getConfFile());
-		if (!conf.isFile()) {
-			LOGGER.error("{} not exists", LocalConfig.getConfFile());
-			return;
-		}
-
-		File baseEntity = new File(conf.getParent(), "template/BaseEntity.java");
-		File baseMapper = new File(conf.getParent(), "template/BaseMapper.java");
-		File baseService = new File(conf.getParent(), "template/BaseService.java");
-		File baseServiceImpl = new File(conf.getParent(), "template/BaseServiceImpl.java");
+		File basedir = LocalConfig.getBasedir();
+		File baseEntity = new File(basedir, "template/BaseEntity.java");
+		File baseMapper = new File(basedir, "template/BaseMapper.java");
+		File baseService = new File(basedir, "template/BaseService.java");
+		File baseServiceImpl = new File(basedir, "template/BaseServiceImpl.java");
 
 		//baseEntity
 		if (baseEntity.isFile()) {
@@ -182,8 +177,8 @@ public class AppendGenerator {
 		// view TemplateServiceImpl.java
 		String template = null;
 		try {
-			File conf = new File(LocalConfig.getConfFile());
-			File temp = new File(conf.getParent(), "template/TemplateServiceImpl.java");
+			File basedir = LocalConfig.getBasedir();
+			File temp = new File(basedir, "template/TemplateServiceImpl.java");
 			template = FileUtils.readFileToString(temp);
 		} catch (IOException e) {
 			LOGGER.error("", e);
