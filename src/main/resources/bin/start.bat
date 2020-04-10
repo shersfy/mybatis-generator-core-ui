@@ -36,6 +36,10 @@ if not %v1% equ %v2% (
 	pause
 )
 
+set encoding=-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8
+
 echo Welcome to Mybatis UI
 echo %DATE:~0,10% %TIME:~0,8% Mybatis UI is running...
-"%javahome%/bin/java" -cp conf;lib/*;./ org.mybatis.app.boot.BootApplication
+
+rem set DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=7788,server=y,suspend=y
+"%javahome%/bin/java" %encoding% %DEBUG_OPTS% -cp conf;lib/*;./ org.mybatis.app.boot.BootApplication

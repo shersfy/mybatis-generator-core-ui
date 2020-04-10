@@ -31,7 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import org.apache.commons.lang.StringUtils;
-import org.mybatis.generator.add.ui.AddMethodMapper;
+import org.mybatis.generator.add.ui.AppendGenerator;
 import org.mybatis.generator.add.ui.Button;
 import org.mybatis.generator.add.ui.CheckBox;
 import org.mybatis.generator.add.ui.CreatedConfigXml;
@@ -52,9 +52,6 @@ import org.slf4j.LoggerFactory;
 
 public class BootApplication extends JFrame implements ActionListener{
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Font FONT_SIZE = new Font(null, Font.BOLD, 20);
 	
@@ -83,9 +80,9 @@ public class BootApplication extends JFrame implements ActionListener{
 	public static String JDBC_PWD  = LocalConfig.getJdbcPassword();
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(BootApplication.class);
+	private static ContextBean config;
 	
 	private JdbcConnectionExt conn;
-	private ContextBean config;
 	private Map<Integer, JPanel> mainPaneMap;
 	
 	//UI
@@ -193,7 +190,6 @@ public class BootApplication extends JFrame implements ActionListener{
 		this.setVisible(true);  
 	}
 
-	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException {
 		String appname = LocalConfig.getAppName();
 		String version = LocalConfig.getAppVersion();
@@ -201,7 +197,11 @@ public class BootApplication extends JFrame implements ActionListener{
 			throw new IOException("application name cannot be empty");
 		}
 		LOGGER.info("start application '{}'", appname);
-		BootApplication ui = new BootApplication(appname+" "+version);
+		new BootApplication(appname+" "+version);
+	}
+	
+	public static ContextBean getContextBean() {
+		return config;
 	}
 	
 	@SuppressWarnings({"unchecked" })
@@ -352,7 +352,7 @@ public class BootApplication extends JFrame implements ActionListener{
 				tables[i].setProperties(sampleTable.getProperties());
 				String name = tbList.get(i);
 				tables[i].setTableName(name);
-				tables[i].setDomainObjectName(AddMethodMapper.underlineToCamel(name.toLowerCase()));
+				tables[i].setDomainObjectName(AppendGenerator.underlineToCamel(name.toLowerCase()));
 			}
 			config.setTables(tables);
 			if(tbList.isEmpty()){
@@ -551,7 +551,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		Font fo = new Font("", Font.BOLD, 14);
 		
 		//第1组
-		subPanel.add(new JLabel("输出路径"));
+		subPanel.add(new JLabel("输出路径（初始化清空目录）"));
 		Button outpath = new Button();
 		outpath.setFont(fo);
 		outpath.setId(11);
@@ -594,7 +594,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		subPanel.add(modePackage);
 		
 		//第3组
-		subPanel.add(new JLabel("Mapper输出包名"));
+		subPanel.add(new JLabel("XML输出包名"));
 		TextField xmlPackage = new TextField(TXT_LEN+10);
 		xmlPackage.setId(31);
 		xmlPackage.setFont(fo);
@@ -602,7 +602,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		subPanel.add(xmlPackage);
 		
 		//第4组
-		subPanel.add(new JLabel("Dao输出类型"));
+		subPanel.add(new JLabel("Mapper输出类型"));
 		JComboBox<String> type = new JComboBox<String>();
 		type.addItem("XMLMAPPER");
 		type.addItem("MIXEDMAPPER");
@@ -610,7 +610,7 @@ public class BootApplication extends JFrame implements ActionListener{
 		type.addItem("MAPPER");
 		subPanel.add(type);
 		
-		subPanel.add(new JLabel("Dao输出包名"));
+		subPanel.add(new JLabel("Mapper输出包名"));
 		TextField daoPackage = new TextField(TXT_LEN+10);
 		daoPackage.setId(41);
 		daoPackage.setFont(fo);

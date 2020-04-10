@@ -1,11 +1,11 @@
 package org.mybatis.generator.add.ui;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -40,7 +40,7 @@ public class CreatedConfigXml {
 	private static Logger logger = LoggerFactory.getLogger(CreatedConfigXml.class);
 	
 	public static File createConfigXml(ContextBean context){
-		File xmlFile = new File(ClassLoader.getSystemResource("./").getPath(), CONF_XML);
+		File xmlFile = new File(ClassLoader.getSystemResource(CONF_XML).getPath());
 		
 		try {
 			Document doc = DocumentHelper.createDocument();
@@ -119,7 +119,7 @@ public class CreatedConfigXml {
 			// 使用4个空格进行缩进
 			xmlFormat.setIndentSize(4);
 			
-			XMLWriter fw = new XMLWriter(new FileWriter(xmlFile), xmlFormat);
+			XMLWriter fw = new XMLWriter(new FileWriterWithEncoding(xmlFile, "UTF-8"), xmlFormat);
 			logger.debug(fw.toString());
 
 			fw.write(doc);
