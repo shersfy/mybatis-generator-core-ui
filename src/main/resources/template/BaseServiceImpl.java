@@ -37,6 +37,15 @@ public abstract class BaseServiceImpl<T extends BaseEntity, Id extends Serializa
 	}
 
 	@Override
+	public int save(Id id, T entity) {
+		if (id==null) {
+			return insert(entity);
+		}
+		
+		return updateById(entity);
+	}
+
+	@Override
 	public int insert(T entity) {
 		if(entity.getCreateTime()==null) {
 			entity.setCreateTime(new Date());
