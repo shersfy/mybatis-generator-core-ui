@@ -175,12 +175,15 @@ public class AppendGenerator {
 
 	public static void generateJavaMapper() {
 
-		// view TemplateServiceImpl.java
-		String template = null;
+		// view Template*.java
+		String tempService = null;
+		String tempController = null;
 		try {
 			File basedir = LocalConfig.getBasedir();
-			File temp = new File(basedir, "template/TemplateServiceImpl.java");
-			template = FileUtils.readFileToString(temp);
+			File temp1 = new File(basedir, "template/TemplateServiceImpl.java");
+			File temp2 = new File(basedir, "template/TemplateController.java");
+			tempService = FileUtils.readFileToString(temp1);
+			tempController = FileUtils.readFileToString(temp2);
 		} catch (IOException e) {
 			LOGGER.error("", e);
 			return;
@@ -203,12 +206,13 @@ public class AppendGenerator {
 				LOGGER.error("", e);
 			}
 
-			// 生成对应的service
+			// 生成对应的service,controller
 			File model = new File(getModelPath(), modelName+".java");
 			try {
 				XmlMapperBean xml = getXmlMapperBean(modelName);
 				generateJavaService(model);
-				generateJavaServiceImpl(model, xml, template);
+				generateJavaServiceImpl(model, xml, tempService);
+				generateJavaController(model, xml, tempController);
 			} catch (Exception e) {
 				LOGGER.error("", e);
 			}
@@ -380,8 +384,7 @@ public class AppendGenerator {
 		File java = new File(parent, String.format("controller/%sController.java", modelName));
 		String parentPkg = getModelParentPkg();
 		String targetPkg = parentPkg+".controller";
-		
-		String service = String.format("%s.service.%s", modelName+"Service");
+		String service   = String.format("%s.service.%s", parentPkg, modelName+"Service");
 
 		LOGGER.info("generate controller {}", java.getAbsolutePath());
 		

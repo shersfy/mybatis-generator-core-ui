@@ -1,49 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>  
-    <!DOCTYPE generatorConfiguration  
-      PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"  
-      "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">  
-    <generatorConfiguration>  
-    	<!-- 数据库驱动-->  
-    	<!-- 
-        <classPathEntry  location="mysql-connector-java-5.1.38-bin.jar"/>  
-         -->
-        <context id="DB2Tables"  targetRuntime="MyBatis3">  
-            <commentGenerator>  
-                <property name="suppressDate" value="false"/>  
-                <!-- 是否去除自动生成的注释 true：是 ： false:否 -->  
-                <property name="suppressAllComments" value="false"/>  
-            </commentGenerator>  
-            <!--数据库链接URL，用户名、密码 -->  
-            <jdbcConnection driverClass="com.mysql.jdbc.Driver" 
-            	connectionURL="jdbc:mysql://192.168.100.136:3306/datahub" 
-            	userId="root" 
-            	password="lenovo"> 
-            </jdbcConnection>  
-            <javaTypeResolver>  
-                <property name="forceBigDecimals" value="false"/>  
-            </javaTypeResolver>  
-            <!-- 生成模型的包名和位置-->  
-            <javaModelGenerator targetPackage="com.lenovo.datahub.domain" targetProject="output">  
-                
-                <!-- 在targetPackage的基础上，根据数据库的schema再生成一层package，最终生成的类放在这个package下，默认为false -->
-                <property name="enableSubPackages" value="true"/>  
-                <!-- 设置是否在getter方法中，对String类型字段调用trim()方法 -->
-                <property name="trimStrings" value="false"/>
-                <!-- 设置一个根对象， 如果设置了这个根对象，那么生成的keyClass或者recordClass会继承这个类；
-                                   在Table的rootClass属性中可以覆盖该选项 注意：如果在key class或者record class中有root class相同的属性，
-                MBG就不会重新生成这些属性了，包括： 1，属性名相同，类型相同，有相同的getter/setter方法；
-				-->
-                <property name="rootClass" value="com.lenovo.datahub.domain.BaseEntity"/>
-            </javaModelGenerator>  
-            <!-- 生成映射文件的包名和位置-->  
-            <sqlMapGenerator targetPackage="mapper" targetProject="output">  
-                <property name="enableSubPackages" value="true"/>  
-            </sqlMapGenerator>  
-            <!-- 生成DAO的包名和位置-->  
-            <javaClientGenerator type="XMLMAPPER" targetPackage="com.lenovo.datahub.dao" targetProject="output">  
-                <property name="enableSubPackages" value="true"/>  
-            </javaClientGenerator>  
-            <!-- 要生成哪些表-->  
-            <table tableName="job_info" domainObjectName="JobInfo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>  
-        </context>  
-    </generatorConfiguration>  
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <!--是否去除自动生成的注释。 true：去除 ; false:保留-->
+        <commentGenerator>
+            <property name="suppressDate" value="false"/>
+            <property name="suppressAllComments" value="false"/>
+        </commentGenerator>
+        <!--数据库链接URL，用户名、密码-->
+        <jdbcConnection password="oawLaWSL@1" driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://10.32.15.91:3306/percent10_api?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false" userId="edpuser"/>
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+        <!--生成model的包名和位置, rootClass指定继承的基类-->
+        <javaModelGenerator targetPackage="top.percent10.api.model" targetProject="C:/mybatis/output">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="false"/>
+            <property name="rootClass" value="org.shersfy.model.BaseEntity"/>
+        </javaModelGenerator>
+        <!--生成映射文件的包名和位置-->
+        <sqlMapGenerator targetPackage="mapping" targetProject="C:/mybatis/output">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!--生成DAO的包名和位置-->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="top.percent10.api.mapper" targetProject="C:/mybatis/output">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <!--要生成哪些表-->
+        <table tableName="report_conf" domainObjectName="ReportConf" selectByExampleQueryId="false" enableDeleteByExample="false" enableCountByExample="false" enableUpdateByExample="false" enableSelectByExample="false"/>
+    </context>
+</generatorConfiguration>
