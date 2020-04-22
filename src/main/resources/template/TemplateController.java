@@ -44,7 +44,6 @@ public class TemplateController extends BaseController {
 		return res;
 	}
 	
-	
 	@PostMapping("/delete")
 	public Result delete(@RequestParam(required = true)%s id) {
 		Result res = new Result();

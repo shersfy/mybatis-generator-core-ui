@@ -390,8 +390,10 @@ public class AppendGenerator {
 		
 		// package
 		String data = template.replace("org.shersfy.controller", targetPkg);
-		// TemplateService
+		// Template
 		data = data.replace("TemplateService", ClassUtils.getShortClassName(service));
+		data = data.replace("TemplateController", FilenameUtils.getBaseName(java.getName()));
+		data = data.replace("Template", modelName);
 
 		// import
 		StringBuffer impt = new StringBuffer();
@@ -400,6 +402,7 @@ public class AppendGenerator {
 			impt.append("\n");
 			impt.append(String.format("import %s;", xml.getModelTypePK()));
 		}
+		impt.append("\n");
 		impt.append(String.format("import %s;", service));
 		
 		String path = CamelCaseUtils.toSeparatorString(modelName, "/");

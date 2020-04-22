@@ -17,7 +17,7 @@ public final class CamelCaseUtils {
 	 * @param camel
 	 * @return
 	 */
-	public static String toSeparatorString(String separator, String camel) {
+	public static String toSeparatorString(String camel, String separator) {
 		if (separator==null || camel == null) {
 			return null;
 		}
@@ -53,7 +53,7 @@ public final class CamelCaseUtils {
 	 * @return
 	 */
 	public static String toUnderlineString(String camel) {
-		return toSeparatorString(SEPARATOR, camel);
+		return toSeparatorString(camel, SEPARATOR);
 	}
 
 	/**
