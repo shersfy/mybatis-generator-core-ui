@@ -31,21 +31,21 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
 import org.apache.commons.lang.StringUtils;
-import org.mybatis.generator.add.ui.AppendGenerator;
 import org.mybatis.generator.add.ui.Button;
 import org.mybatis.generator.add.ui.CheckBox;
 import org.mybatis.generator.add.ui.CreatedConfigXml;
 import org.mybatis.generator.add.ui.TextField;
 import org.mybatis.generator.add.ui.beans.CommentGenerator;
 import org.mybatis.generator.add.ui.beans.ContextBean;
-import org.mybatis.generator.add.ui.beans.JdbcConnectionExt;
 import org.mybatis.generator.add.ui.beans.JavaClientGenerator;
 import org.mybatis.generator.add.ui.beans.JavaModelGenerator;
 import org.mybatis.generator.add.ui.beans.JavaTypeResolver;
 import org.mybatis.generator.add.ui.beans.JdbcConnection;
+import org.mybatis.generator.add.ui.beans.JdbcConnectionExt;
 import org.mybatis.generator.add.ui.beans.SqlMapGenerator;
 import org.mybatis.generator.add.ui.beans.Table;
 import org.mybatis.generator.api.ShellRunner;
+import org.mybatis.generator.internal.util.CamelCaseUtils;
 import org.shersfy.utils.LocalConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -352,7 +352,7 @@ public class BootApplication extends JFrame implements ActionListener{
 				tables[i].setProperties(sampleTable.getProperties());
 				String name = tbList.get(i);
 				tables[i].setTableName(name);
-				tables[i].setDomainObjectName(AppendGenerator.underlineToCamel(name.toLowerCase()));
+				tables[i].setDomainObjectName(CamelCaseUtils.toCamelCaseString(name.toLowerCase(), true));
 			}
 			config.setTables(tables);
 			if(tbList.isEmpty()){

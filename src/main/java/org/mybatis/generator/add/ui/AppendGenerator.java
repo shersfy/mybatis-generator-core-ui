@@ -21,6 +21,7 @@ import org.dom4j.io.XMLWriter;
 import org.mybatis.app.boot.BootApplication;
 import org.mybatis.generator.add.ui.beans.ContextBean;
 import org.mybatis.generator.add.ui.beans.XmlMapperBean;
+import org.mybatis.generator.internal.util.CamelCaseUtils;
 import org.shersfy.model.BaseEntity;
 import org.shersfy.utils.LocalConfig;
 import org.shersfy.utils.SAXReaderUtil;
@@ -335,18 +336,19 @@ public class AppendGenerator {
 
 	public static void generateJavaServiceImpl(File model, 
 			XmlMapperBean xml, String template) throws IOException {
+		
 		String parent = model.getParentFile().getParent();
 		String modelName = FilenameUtils.getBaseName(model.getName());
 
-		File serviceImpl = new File(parent, String.format("service/impl/%sServiceImpl.java", modelName));
+		File java = new File(parent, String.format("service/impl/%sServiceImpl.java", modelName));
 		String mapperPkg = BootApplication.getContextBean().getJavaClientGenerator().getTargetPackage();
-		String servicePkg = getModelParentPkg()+".service";
+		String targetPkg = getModelParentPkg()+".service";
 
-		LOGGER.info("generate service implement {}", serviceImpl.getAbsolutePath());
+		LOGGER.info("generate service implement {}", java.getAbsolutePath());
 		
 		// package
 		String data = template.replace("org.shersfy.mapper", mapperPkg);
-		data = data.replace("org.shersfy.service", servicePkg);
+		data = data.replace("org.shersfy.service", targetPkg);
 		// TemplateMapper
 		data = data.replace("TemplateMapper", modelName+"Mapper");
 		// TemplateService
@@ -359,12 +361,51 @@ public class AppendGenerator {
 			impt.append("\n");
 			impt.append(String.format("import %s;", xml.getModelTypePK()));
 		}
+		
 		// type
 		String type = String.format("%s, %s", modelName,
 				ClassUtils.getShortClassName(xml.getModelTypePK()));
-
+		// 3个参数替换
 		data = String.format(data, impt, type, type);
-		FileUtils.write(serviceImpl, data);
+		FileUtils.write(java, data);
+	}
+	
+	
+	public static void generateJavaController(File model, 
+			XmlMapperBean xml, String template) throws IOException {
+		
+		String parent = model.getParentFile().getParent();
+		String modelName = FilenameUtils.getBaseName(model.getName());
+
+		File java = new File(parent, String.format("controller/%sController.java", modelName));
+		String parentPkg = getModelParentPkg();
+		String targetPkg = parentPkg+".controller";
+		
+		String service = String.format("%s.service.%s", modelName+"Service");
+
+		LOGGER.info("generate controller {}", java.getAbsolutePath());
+		
+		// package
+		String data = template.replace("org.shersfy.controller", targetPkg);
+		// TemplateService
+		data = data.replace("TemplateService", ClassUtils.getShortClassName(service));
+
+		// import
+		StringBuffer impt = new StringBuffer();
+		impt.append(String.format("import %s;", xml.getModelType()));
+		if (!xml.getModelTypePK().startsWith("java.lang")) {
+			impt.append("\n");
+			impt.append(String.format("import %s;", xml.getModelTypePK()));
+		}
+		impt.append(String.format("import %s;", service));
+		
+		String path = CamelCaseUtils.toSeparatorString(modelName, "/");
+		// pktype
+		String pktype = ClassUtils.getShortClassName(xml.getModelTypePK());
+
+		// 4个参数替换
+		data = String.format(data, impt, path, pktype, pktype);
+		FileUtils.write(java, data);
 	}
 
 	public static void replacePackage(File file) throws IOException {
@@ -429,7 +470,7 @@ public class AppendGenerator {
 			if1.addAttribute("test", "startIndex !=null  and pageSize !=null");
 			if1.setText("limit #{startIndex}, #{pageSize}");
 
-			String table = camelToUnderline(ClassUtils.getShortClassName(paramType));
+			String table = CamelCaseUtils.toUnderlineString(ClassUtils.getShortClassName(paramType));
 
 			Element select = DocumentHelper.createElement("select");
 			select.addAttribute("id", "findList");
@@ -563,46 +604,6 @@ public class AppendGenerator {
 		} 
 
 	}
-
-	/**驼峰转下横线**/
-	public static String camelToUnderline(String param){  
-		if (param==null||"".equals(param.trim())){  
-			return "";  
-		}  
-		int len=param.length();  
-		StringBuilder sb=new StringBuilder(len); 
-		sb.append(Character.toLowerCase(param.charAt(0)));
-		for (int i = 1; i < len; i++) {  
-			char c=param.charAt(i);  
-			if (Character.isUpperCase(c)){  
-				sb.append("_");
-				sb.append(Character.toLowerCase(c));  
-			}else{  
-				sb.append(c);  
-			}  
-		}  
-		return sb.toString();
-	}
-	/**下横线转驼峰**/
-	public static String underlineToCamel(String param){  
-		if (param==null||"".equals(param.trim())){  
-			return "";  
-		}  
-		int len=param.length();  
-		StringBuilder sb=new StringBuilder(len);
-		sb.append(Character.toUpperCase(param.charAt(0)));
-		for (int i = 1; i < len; i++) {  
-			char c=param.charAt(i);  
-			if (c=='_'){  
-				if (++i<len){  
-					sb.append(Character.toUpperCase(param.charAt(i)));  
-				}  
-			}else{  
-				sb.append(c);  
-			}  
-		}  
-		return sb.toString();
-	}  
 
 	public static String getXmlMappingPath() {
 
