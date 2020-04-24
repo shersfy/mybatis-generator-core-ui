@@ -22,6 +22,13 @@ public class TemplateController extends BaseController {
 	
 	@Autowired
 	private TemplateService service;
+
+	@GetMapping("/detail")
+	public Result detail(@RequestParam(required = true)Long id) {
+		Result res = new Result();
+		res.setModel(service.findById(id));
+		return res;
+	}
 	
 	@GetMapping("/list")
 	public Result list(BaseForm form) {
