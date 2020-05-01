@@ -6,10 +6,15 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.sql.DriverManager;
@@ -424,13 +429,46 @@ public class BootApplication extends JFrame implements ActionListener{
 		list.setVisibleRowCount(8);
 		subPanel.add(scrollPane);
 		
-		subPanel.add(new JLabel());
+		// 输出路径
+		subPanel.add(new JLabel("输出路径"));
 		JTextPane output = new JTextPane();
-		output.setLayout(new FlowLayout(FlowLayout.LEFT));
+		output.setLayout(new FlowLayout(FlowLayout.CENTER));
 		output.setBackground(subPanel.getBackground());
 		output.setEditable(false);
 		output.setFont(fo);
 		output.setPreferredSize(new Dimension(200, 40));
+		output.setText(OUTPATH);
+		output.setToolTipText("右键拷贝到剪贴板");
+		output.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// 点击鼠标右键
+				if (e.getButton()==MouseEvent.BUTTON3) {
+					Transferable contents = new StringSelection(output.getText());
+					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(contents, null);
+					JOptionPane.showMessageDialog(null, "已拷贝到剪贴板");
+				}
+			}
+		});
 		subPanel.add(output);
 		
 		JTextPane txtPane1 = new JTextPane();
