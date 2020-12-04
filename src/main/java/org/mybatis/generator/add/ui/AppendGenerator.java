@@ -272,6 +272,8 @@ public class AppendGenerator {
 		lines.add(StringUtils.EMPTY);
 
 		// import
+		lines.add("import org.apache.ibatis.annotations.Mapper;");
+		lines.add(StringUtils.EMPTY);
 		lines.add(String.format("import %s;", xml.getModelType()));
 		if (!xml.getModelTypePK().startsWith("java.lang")) {
 			lines.add(String.format("import %s;", xml.getModelTypePK()));
@@ -279,6 +281,7 @@ public class AppendGenerator {
 		lines.add(StringUtils.EMPTY);
 
 		// public interface XxxMapper
+		lines.add("@Mapper");
 		String str1 = String.format("public interface %sMapper ", xml.getModelName());
 		// extends BaseMapper<Xxx, XxxKey>{
 		String str2 = String.format("extends BaseMapper<%s, %s>{", xml.getModelName(),
